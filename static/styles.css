@@ -1,0 +1,65 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5dc;
+}
+header {
+  text-align: center;
+  padding: 20px;
+  background-color: #237be0; /* Blue for techy trust */
+  color: white;
+  margin-bottom: 20px;
+}
+h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #4a90e2; /* Blue to tie to header */
+  text-align: center;
+  margin: 20px 0;
+}
+#book-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  margin: 20px auto;
+  gap: 12px; /* Space between inputs */
+}
+input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+}
+input:focus {
+  outline: none;
+  border-color: #4caf50; /* Green for focus */
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+button {
+  padding: 12px;
+  font-size: 16px;
+  background-color: #4caf50; /* Green for sustainability */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button:hover {
+  background-color: #45a049;
+}
+.book-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
+}
+

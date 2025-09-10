@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BookBank</title>
+  <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+  <header>
+    <h1>BookBank: Share Your Stories</h1>
+  </header>
+  <main>
+    <section>
+      <!-- Form for adding a book -->
+    <h2>Add a Book to Share</h2>
+    <form id="book-form">
+      <input type="text" id="title" name="title" placeholder="Book Title"><!-- Title of the book -->
+      <input type="text" id="author" name="author" placeholder="Author" > <!-- Author of the book -->
+      <input type="text" id="genre" name="genre" placeholder="Genre (e.g., History, Culture)" > <!-- Genre of the book -->
+      <input type="text" id="condition" name="condition" placeholder="Condition (e.g., Good)"> <!-- Condition of the book -->
+      <input type="text" id="thumbnail" name="thumbnail" placeholder="Thumbnail URL"> <!-- Url for the thumbnail of the book -->
+      <button type="submit">Add Book</button> <!-- Button to add the book -->
+    </form>
+  </section>
+  <!-- Section for the available books -->
+    <section>
+    <h2>Available Books</h2>
+    <div class="book-list"></div>
+  </section>
+  </main>
+</body>
+</html>
