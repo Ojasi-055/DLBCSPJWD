@@ -90,8 +90,8 @@ button {
 button:hover {
   background-color: #45a049;
 }
-.book-list,
-.request-list {
+#book-list,
+#request-list {
   display: grid;
   /* Grid for the books and requests-list:
   each book and request is a grid item, the grid is responsive and the grid items are spaced out by 20px */
@@ -100,4 +100,52 @@ button:hover {
   max-width: 1200px;
   margin: 20px auto;
 }
+.book-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+.book-card:hover {
+  transform: scale(1.05); /* Subtle zoom on hover */
+}
+.book-card img {
+  max-width: 120px;
+  height: auto;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+.book-card h3 {
+  font-size: 18px;
+  margin: 10px 0;
+  color: #333;
+}
+.book-card p {
+  font-size: 14px;
+  margin: 5px 0;
+  color: #555;
+}
 
+/* Responsive design for mobile */
+@media (max-width: 600px) {
+  #add-book-form,
+  #book-list,
+  #request-list {
+    width: 90%;
+  }
+  #book-list {
+    grid-template-columns: 1fr; /* Single column on small screens */
+  }
+  h1 {
+    font-size: 24px;
+  }
+  h2 {
+    font-size: 20px;
+  }
+  nav a {
+    font-size: 14px;
+    margin: 0 10px;
+  }
+}
