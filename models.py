@@ -1,5 +1,10 @@
 from db import db
 
+# User model
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)                        # Unique identifier for each user
+    username = db.Column(db.String(80), unique=True, nullable=False)    # Username of the user
+    password = db.Column(db.String(120), nullable=False)                # Hashed password of the user
 
 # Book model
 class Book(db.Model):

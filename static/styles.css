@@ -149,3 +149,20 @@ button:hover {
     margin: 0 10px;
   }
 }
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  margin: 20px auto;
+  gap: 3px;
+}
+
+.auth-form label {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+p {
+  text-align: center;
+}
