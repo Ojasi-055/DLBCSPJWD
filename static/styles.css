@@ -7,7 +7,7 @@ body {
 header {
   text-align: center;
   padding: 20px;
-  background-color: #237be0; /* Blue for techy trust */
+  background-color: #237be0;
   color: white;
   margin-bottom: 20px;
 }
@@ -19,7 +19,7 @@ h1 {
 h2 {
   font-size: 24px;
   font-weight: 600;
-  color: #4a90e2; /* Blue to tie to header */
+  color: #237be0; /* Blue to tie to header */
   text-align: center;
   margin: 20px 0;
 }
@@ -55,8 +55,11 @@ button {
 button:hover {
   background-color: #45a049;
 }
-.book-list {
+.book-list,
+.request-list {
   display: grid;
+  /* Grid for the books and requests-list:
+  each book and request is a grid item, the grid is responsive and the grid items are spaced out by 20px */
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   max-width: 1200px;
