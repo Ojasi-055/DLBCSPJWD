@@ -9,6 +9,6 @@ from app import app, db
 with app.app_context():
     db.create_all()  # Create database tables for our data models
 
-
+# Run the app
 if __name__ == '__main__':
     app.run(debug=True)
