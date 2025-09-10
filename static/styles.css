@@ -166,3 +166,9 @@ button:hover {
 p {
   text-align: center;
 }
+
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}

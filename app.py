@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from db import db
 from models import Book, User
 
@@ -20,9 +20,15 @@ def login():
         # Handle login form submission
         username = request.form['username']
         password = request.form['password']
-
-        return redirect(url_for('index'))
-
+        # Look for the user in the database
+        user = User.query.filter_by(username=username, password=password).first()
+        # If user exists, store the name and id in session for further actions
+        if user:
+            session['user_id'] = user.id
+            session['username'] = user.username
+            return redirect(url_for('index'))
+        # Return an error in case of failure
+        return render_template('login.html', error='Invalid credentials')
     # Render the login form
     return render_template('login.html')
 
@@ -33,30 +39,44 @@ def register():
         # Handle registration form submission
         username = request.form['username']
         password = request.form['password']
-        # Add your registration logic here
+        # Check if the username already exists in the database and reject user creation if it does
         if User.query.filter_by(username=username).first():
             return render_template('register.html', error='Username already exists')
         user = User(username=username, password=password)
         db.session.add(user)
         db.session.commit()
+        # Redirect to login page
         return redirect(url_for('login'))
     # Render the registration form
     return render_template('register.html')
 
+# Logout route
+@app.route('/logout')
+def logout():
+    # Remove the user details from the session data for a fresh application experience
+    session.pop('user_id', None)
+    session.pop('username', None)
+    return redirect(url_for('login'))
 
 # Home route
 @app.route('/')
 def index():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     return render_template('index.html')
 
 # Books route
 @app.route('/books')
 def books():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     return render_template('books.html')
 
 # Requests routemodels.py
 @app.route('/requests')
 def requests():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     return render_template('requests.html')
 
 @app.route('/users')
