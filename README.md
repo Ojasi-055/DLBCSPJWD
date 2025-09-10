@@ -1,3 +1,3 @@
 # DLBCSPJWD
 
-By Ojaai Kulkarni
+By Ojasi Kulkarni
