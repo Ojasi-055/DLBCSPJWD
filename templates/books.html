@@ -21,9 +21,23 @@
     <main>
         <section>
             <h2>Your Books</h2>
+            {% if books %}
             <!-- List of the books that the user has added -->
             <div class="book-list"></div>
+            {% for book in books %}
+            <div class="book-card">
+                <img src="{{ book.thumbnail }}" alt="{{ book.title }}">
+                <h3>{{ book.title }}</h3>
+                <p>Author: {{ book.author }}</p>
+                <p>Genre: {{ book.genre }}</p>
+                <p>Condition: {{ book.condition }}</p>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>You have not added any books yet.</p>
+            {% endif %}
         </section>
     </main>
+    <script src="../static/js/books.js"></script>
 </body>
 </html>

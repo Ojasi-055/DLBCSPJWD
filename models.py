@@ -9,6 +9,8 @@ class User(db.Model):
 # Book model
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)            # Unique identifier for each book
+    # Foreign key to the user who owns the book
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.String(200), nullable=False)       # Title of the book
     author = db.Column(db.String(100), nullable=False)      # Author of the book
     genre = db.Column(db.String(50), nullable=False)        # Genre of the book
@@ -21,6 +23,7 @@ class Book(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'user_id': self.user_id,
             'title': self.title,
             'author': self.author,
             'genre': self.genre,

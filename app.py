@@ -5,7 +5,7 @@ from models import Book, User
 app = Flask(__name__)
 # Configuration: Database URI and Secret Key
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bookbank.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # To suppress a warning
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'ojk055@bookbank_dlbcspjwd#IU2025'
 
 # Initialize the database
@@ -70,7 +70,8 @@ def index():
 def books():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('books.html')
+    books = Book.query.filter_by(user_id=session['user_id']).all()
+    return render_template('books.html', books=books)
 
 # Requests routemodels.py
 @app.route('/requests')
