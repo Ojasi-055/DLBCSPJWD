@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from db import db
 from datetime import datetime, timezone
-from models import Book, User
+from models import Book, Request, User
 
 app = Flask(__name__)
 # Configuration: Database URI and Secret Key
@@ -120,4 +120,14 @@ def delete_book(book_id):
     db.session.delete(book)
     db.session.commit()
     return jsonify({'ok': True})
+
+
+@app.route('/request_book/<int:book_id>', methods=['POST'])
+def request_book(book_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in'}), 401
+    req = Request(requester_id=session['user_id'], book_id=book_id, requested_to=book.owner_id)
+    db.session.add(req)
+    db.session.commit()
+    return jsonify({'message': 'Request logged'})
 

@@ -34,3 +34,10 @@ class Book(db.Model):
             'holder': User.query.get(self.holder_id).username,
             'possessed_since': self.possessed_since.isoformat() 
         }
+
+class Request(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    requester_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now(timezone.utc))
+    status = db.Column(db.String(20), nullable=False, default='open') 

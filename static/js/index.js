@@ -50,10 +50,6 @@ async function fetchBooks() {
 }
 
 
-async function requestBook(bookId) {
-    alert("Book requested");
-}
-
 // Event listeners
 document.getElementById('add-book-form').addEventListener('submit', (e) => {
     // Prevent form submission
