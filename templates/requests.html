@@ -18,28 +18,29 @@
             </ul>
         </nav> 
     </header>
-    <main>
-        <section>
-            <h2>Your Requests</h2>
-            <!-- Section for the requests that the user has made -->
-            <div id="request-list"></div>
-            {% if requests %}
-            {% for request in requests %}
-            <div class="book-card">
-                <h3>{{ request.title }}</h3>
-                <p>Author: {{ request.author }}</p>
-                <p>Genre: {{ request.genre }}</p>
-                <p>Condition: {{ request.condition }}</p>
-                <p>Owner: {{ request.owner }}</p>
-                <p>Since: {{ request.possessed_since }}</p>
-                <p>Holder: {{ request.holder }}</p>
-                <p>Status: {{ request.status }}</p>                    
-            </div>
-            {% endfor %}
-            {% else %}
-            <p>You have not made any requests yet.</p>
-            {% endif %}
-        </section>
-    </main>
+        <main>
+            <section>
+                <h2>Your Requests</h2>
+                <!-- Section for the requests that the user has made -->
+                <div id="request-list">
+                    {% if requests %}
+                    {% for request in requests %}
+                    <div class="book-card">
+                        <h3>{{ request.title }}</h3>
+                        <img src="{{ request.thumbnail }}" alt="{{ request.title }}" onerror="this.onerror=null;this.src='static/default.png';">
+                        <p>Author: {{ request.author }}</p>
+                        <p>Condition: {{ request.condition }}</p>
+                        <p>Owner: {{ request.requested_to }}</p>
+                        <p>Holder: {{ request.holder }}</p>
+                        <p>Created At: {{ request.created_at }}</p>
+                        <p>Status: {{ request.status }}</p>                    
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>You have not made any requests yet.</p>
+                    {% endif %}
+                </div>
+            </section>
+        </main>
 </body>
 </html>

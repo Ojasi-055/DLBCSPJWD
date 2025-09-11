@@ -41,5 +41,19 @@ class Request(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now(timezone.utc))
     status = db.Column(db.String(20), nullable=False, default='open')  # open, accepted, return_initiated, completed
-    completed_at = db.Column(db.DateTime)
     requested_to = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    # Convert request to dict with its attributes
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'requester': User.query.get(self.requester_id).username,
+            'title': Book.query.get(self.book_id).title,
+            'author': Book.query.get(self.book_id).author,
+            'condition': Book.query.get(self.book_id).condition,
+            'thumbnail': Book.query.get(self.book_id).thumbnail,
+            'requested_to': User.query.get(self.requested_to).username,
+            'holder': User.query.get(Book.query.get(self.book_id).holder_id).username,
+            'created_at': self.created_at.isoformat(),
+            'status': self.status,
+        }

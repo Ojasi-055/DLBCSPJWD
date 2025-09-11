@@ -135,7 +135,8 @@ button:hover {
   #request-list {
     width: 90%;
   }
-  #book-list {
+  #book-list,
+  #request-list {
     grid-template-columns: 1fr; /* Single column on small screens */
   }
   h1 {

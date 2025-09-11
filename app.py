@@ -80,9 +80,9 @@ def requests():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     requests = Request.query.filter_by(requester_id=session['user_id']).all()
-    books_ids = [request.book_id for request in requests]
-    requests = Book.query.filter(Book.id.in_(books_ids)).all()
-    return render_template('requests.html', requests=requests)
+    # return jsonify([book.to_dict() for book in Book.query.all()]);
+    request_objs = [request.to_dict() for request in requests]
+    return render_template('requests.html', requests=request_objs)
 
 # Route for checking users for development
 @app.route('/users')
@@ -135,7 +135,12 @@ def request_book(book_id):
     existing = Request.query.filter_by(requester_id=session['user_id'], book_id=book_id).first()
     if existing:
         return jsonify({'message': 'Already requested'})
-    req = Request(requester_id=session['user_id'], book_id=book_id, requested_to=book.owner_id)
+    req = Request(
+        requester_id=session['user_id'],
+        book_id=book_id,
+        requested_to=book.owner_id
+        ),
+    
     db.session.add(req)
     db.session.commit()
     return jsonify({'message': 'Request logged'})
