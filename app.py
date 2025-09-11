@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from db import db
+from datetime import datetime, timezone
 from models import Book, User
 
 app = Flask(__name__)
@@ -70,7 +71,7 @@ def index():
 def books():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    books = Book.query.filter_by(user_id=session['user_id']).all()
+    books = Book.query.filter_by(owner_id=session['user_id']).all()
     return render_template('books.html', books=books)
 
 # Requests routemodels.py
@@ -80,6 +81,7 @@ def requests():
         return redirect(url_for('login'))
     return render_template('requests.html')
 
+# Route for checking users for development
 @app.route('/users')
 def users():
     return jsonify([{'id': user.id, 'username': user.username, 'password': user.password} for user in User.query.all()])
@@ -94,10 +96,28 @@ def add_book():
             author=data['author'],
             genre=data['genre'],
             condition=data['condition'],
-            thumbnail=data['thumbnail']
+            thumbnail=data['thumbnail'],
+            owner_id=session['user_id'],
+            holder_id=session['user_id'],
+            possessed_since=datetime.now(timezone.utc)
         )
         db.session.add(book)
         db.session.commit()
         return jsonify({'ok': True})
     if request.method == 'GET':
         return jsonify([book.to_dict() for book in Book.query.all()]);
+
+# Route for deleting a book
+@app.route('/api/book/<int:book_id>', methods=['DELETE'])
+def delete_book(book_id):
+    book = Book.query.get(book_id)
+    user = User.query.get(session['user_id'])
+
+    if not book:
+        return jsonify({'error': 'Book not found'})
+    if book.owner_id != user.id:
+        return jsonify({'error': 'Unauthorized'})
+    db.session.delete(book)
+    db.session.commit()
+    return jsonify({'ok': True})
+

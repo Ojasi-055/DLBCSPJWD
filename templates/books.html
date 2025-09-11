@@ -26,11 +26,14 @@
             <div class="book-list"></div>
             {% for book in books %}
             <div class="book-card">
-                <img src="{{ book.thumbnail }}" alt="{{ book.title }}">
+            <img src="${book.thumbnail}" alt="${book.title}" onerror="this.onerror=null;this.src='static/default.png';">            
                 <h3>{{ book.title }}</h3>
                 <p>Author: {{ book.author }}</p>
                 <p>Genre: {{ book.genre }}</p>
                 <p>Condition: {{ book.condition }}</p>
+                <p>Owner: {{ book.owner }}</p>
+                <p>Since: {{ book.possessed_since }}</p>
+                <button onclick="deleteBook('{{ book.id }}')">Delete Book</button>
             </div>
             {% endfor %}
             {% else %}

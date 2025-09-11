@@ -23,6 +23,7 @@ async function addBook(event) {
     if (result.ok) {
         alert('Book added successfully!');
         form.reset();
+        fetchBooks();
     } else {
         alert('Error adding book: ' + result.error);
     }
@@ -39,9 +40,18 @@ async function fetchBooks() {
             <p>Condition: ${book.condition}</p>
             <p>Author: ${book.author}</p>
             <p>Genre: ${book.genre}</p>
+            <p>Holder: ${book.holder}</p>
+            <p>Owner: ${book.owner} | Since: ${book.possessed_since}</p>
+            <button onclick="requestBook(${book.id})">Request Book</button>
+
         </div>
     `).join('');
     console.log('Books fetched and displayed.');
+}
+
+
+async function requestBook(bookId) {
+    alert("Book requested");
 }
 
 // Event listeners
@@ -51,6 +61,7 @@ document.getElementById('add-book-form').addEventListener('submit', (e) => {
     // Run the addBook function
     addBook();
 });
+
 
 // Initialize book list
 window.onload = fetchBooks;
