@@ -139,8 +139,7 @@ def request_book(book_id):
         requester_id=session['user_id'],
         book_id=book_id,
         requested_to=book.owner_id
-        ),
-    
+    )
     db.session.add(req)
     db.session.commit()
     return jsonify({'message': 'Request logged'})
