@@ -79,7 +79,9 @@ def books():
 def requests():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    requests = Request.query.filter_by(requestor_id=session['user_id']).all()
+    requests = Request.query.filter_by(requester_id=session['user_id']).all()
+    books_ids = [request.book_id for request in requests]
+    requests = Book.query.filter(Book.id.in_(books_ids)).all()
     return render_template('requests.html', requests=requests)
 
 # Route for checking users for development
