@@ -40,4 +40,6 @@ class Request(db.Model):
     requester_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now(timezone.utc))
-    status = db.Column(db.String(20), nullable=False, default='open') 
+    status = db.Column(db.String(20), nullable=False, default='open')  # open, accepted, return_initiated, completed
+    completed_at = db.Column(db.DateTime)
+    requested_to = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

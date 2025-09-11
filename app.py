@@ -79,7 +79,8 @@ def books():
 def requests():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('requests.html')
+    requests = Request.query.filter_by(requestor_id=session['user_id']).all()
+    return render_template('requests.html', requests=requests)
 
 # Route for checking users for development
 @app.route('/users')
@@ -126,6 +127,12 @@ def delete_book(book_id):
 def request_book(book_id):
     if 'user_id' not in session:
         return jsonify({'error': 'Please log in'}), 401
+    book = Book.query.get_or_404(book_id)
+    if book.owner_id == session['user_id']:
+        return jsonify({'error': "You can't request your own book"}), 400
+    existing = Request.query.filter_by(requester_id=session['user_id'], book_id=book_id).first()
+    if existing:
+        return jsonify({'message': 'Already requested'})
     req = Request(requester_id=session['user_id'], book_id=book_id, requested_to=book.owner_id)
     db.session.add(req)
     db.session.commit()
