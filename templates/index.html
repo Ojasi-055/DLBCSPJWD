@@ -1,45 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BookBank</title>
-  <link rel="stylesheet" href="static/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookBank - Home</title>
+    <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
-  <header>
-    <h1>BookBank: Share Your Stories</h1>
-    <nav>
-      <ul class="nav">
-        <li><a href="/" aria-current="page">Home</a></li>
-        <li><a href="/books">Your Books</a></li>
-        <li><a href="/requests">Your Requests</a></li>
-        <li><a href="/logout">Log Out</a></li>
-      </ul>
-    </nav>
-  </header>
-  <main>
-    <section>
-      <!-- Form for adding a book -->
-    <h2>Add a Book to Share</h2>
-    <form id="add-book-form">
-      <input type="text" id="title" name="title" placeholder="Book Title"><!-- Title of the book -->
-      <input type="text" id="author" name="author" placeholder="Author" > <!-- Author of the book -->
-      <input type="text" id="genre" name="genre" placeholder="Genre (e.g., History, Culture)" > <!-- Genre of the book -->
-      <input type="text" id="condition" name="condition" placeholder="Condition (e.g., Good)"> <!-- Condition of the book -->
-      <input type="text" id="thumbnail" name="thumbnail" placeholder="Thumbnail URL"> <!-- Url for the thumbnail of the book -->
-      <button type="submit">Add Book</button> <!-- Button to add the book -->
-    </form>
-  </section>
-  <!-- Section for the available books -->
-    <section>
-    <h2>Available Books</h2>
-    <div id="book-list"></div>
-  </section>
-  </main>
-  <!-- This script handles book addition and fetch requests on the page -->
-  <script src="../static/js/index.js"></script>
-  <!-- This script handles book requesting -->
-  <script src="../static/js/requests.js"></script>
+    <!-- Main Navigation Header -->
+    <header>
+        <h1>BookBank: Share Your Stories</h1>
+        <nav>
+            <ul class="nav">
+                <li><a href="/" aria-current="page">Home</a></li>
+                <li><a href="/books">Your Books</a></li>
+                <li><a href="/requests">Your Requests</a></li>
+                <li><a href="/logout">Log Out</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main>
+        <!-- Book Addition Section -->
+        <section class="add-book-section">
+            <h2>Add a Book to Share</h2>
+            <form id="add-book-form" class="book-form">
+                <!-- Book Title Input -->
+                <input type="text" 
+                       id="title" 
+                       name="title" 
+                       placeholder="Book Title" 
+                       required>
+                
+                <!-- Author Input -->
+                <input type="text" 
+                       id="author" 
+                       name="author" 
+                       placeholder="Author" 
+                       required>
+                
+                <!-- Genre Input -->
+                <input type="text" 
+                       id="genre" 
+                       name="genre" 
+                       placeholder="Genre (e.g., History, Culture)" 
+                       required>
+                
+                <!-- Condition Input -->
+                <input type="text" 
+                       id="condition" 
+                       name="condition" 
+                       placeholder="Condition (e.g., Good)" 
+                       required>
+                
+                <!-- Thumbnail URL Input -->
+                <input type="text" 
+                       id="thumbnail" 
+                       name="thumbnail" 
+                       placeholder="Thumbnail URL">
+                
+                <!-- Submit Button -->
+                <button type="submit">Add Book</button>
+            </form>
+        </section>
+
+        <!-- Available Books Display Section -->
+        <section class="books-display-section">
+            <h2>Available Books</h2>
+            <div id="book-list" class="book-list">
+                <!-- Books will be dynamically loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript Files -->
+    <!-- Handles book addition and fetching functionality -->
+    <script src="static/js/index.js"></script>
+    <!-- Handles book requesting functionality -->
+    <script src="static/js/common.js"></script>
 </body>
 </html>

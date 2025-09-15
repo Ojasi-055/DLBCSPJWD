@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from db import db
 from datetime import datetime, timezone
-from models import Book, Request, User
+from models import Book, ChatMessage, Request, User
 
 app = Flask(__name__)
 # Configuration: Database URI and Secret Key
@@ -11,6 +11,11 @@ app.config['SECRET_KEY'] = 'ojk055@bookbank_dlbcspjwd#IU2025'
 
 # Initialize the database
 db.init_app(app)
+
+@app.template_filter('datetimeformat')
+def datetimeformat(value, format='%H:%M'):
+    return datetime.fromisoformat(value).strftime(format)
+
 
 # Routes
 
@@ -72,15 +77,15 @@ def books():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     books = Book.query.filter_by(owner_id=session['user_id']).all()
-    return render_template('books.html', books=books)
+    book_objs = [book.to_dict() for book in books]
+    return render_template('books.html', books=book_objs)
 
-# Requests routemodels.py
+# Requests route
 @app.route('/requests')
 def requests():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     requests = Request.query.filter_by(requester_id=session['user_id']).all()
-    # return jsonify([book.to_dict() for book in Book.query.all()]);
     request_objs = [request.to_dict() for request in requests]
     return render_template('requests.html', requests=request_objs)
 
@@ -106,7 +111,7 @@ def add_book():
         )
         db.session.add(book)
         db.session.commit()
-        return jsonify({'ok': True})
+        return jsonify({'ok': True, 'message': 'Book added successfully'})
     if request.method == 'GET':
         return jsonify([book.to_dict() for book in Book.query.all()]);
 
@@ -122,7 +127,7 @@ def delete_book(book_id):
         return jsonify({'error': 'Unauthorized'})
     db.session.delete(book)
     db.session.commit()
-    return jsonify({'ok': True})
+    return jsonify({'ok': True, 'message': 'Book deleted successfully'})
 
 
 @app.route('/request_book/<int:book_id>', methods=['POST'])
@@ -142,5 +147,122 @@ def request_book(book_id):
     )
     db.session.add(req)
     db.session.commit()
-    return jsonify({'message': 'Request logged'})
+    return jsonify({'ok': True, 'message': 'Request sent successfully'})
 
+@app.route('/request/<int:req_id>', methods=['DELETE'])
+def delete_request(req_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in'}), 401
+    req = Request.query.get_or_404(req_id)
+    user_id = session['user_id']
+    book = Book.query.get(req.book_id)
+    is_requester = (req.requester_id == user_id)
+    is_owner = (book.owner_id == user_id) if book else False
+    if not (is_requester or is_owner):
+        return jsonify({'error': 'Only requester or owner can delete request'}), 403
+    if is_requester and req.status not in ['open', 'rejected', 'completed']:
+        return jsonify({'error': 'Requester can delete only while request is open or rejected or completed'}), 403
+    ChatMessage.query.filter_by(request_id=req.id).delete()
+    db.session.delete(req)
+    db.session.commit()
+    return jsonify({'ok': True, 'message': 'Request deleted'})
+
+@app.route('/request/<int:req_id>/accept', methods=['POST'])
+def accept_request(req_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in'}), 401
+    req = Request.query.get_or_404(req_id)
+    book = Book.query.get(req.book_id)
+    if not book or book.owner_id != session['user_id']:
+        return jsonify({'error': 'Only owner can accept'}), 403
+    req.status = 'accepted'
+    book.holder_id = req.requester_id
+    db.session.commit()
+    return jsonify({'ok': True, 'message': 'Request accepted'})
+
+@app.route('/request/<int:req_id>/reject', methods=['POST'])
+def reject_request(req_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in'}), 401
+    req = Request.query.get_or_404(req_id)
+    book = Book.query.get(req.book_id)
+    if not book or book.owner_id != session['user_id']:
+        return jsonify({'error': 'Only owner can reject'}), 403
+    req.status = 'rejected'
+    db.session.commit()
+    return jsonify({'ok': True, 'message': 'Request rejected'})
+
+@app.route('/request/<int:req_id>/initiate_return', methods=['POST'])
+def initiate_return(req_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in'}), 401
+    req = Request.query.get_or_404(req_id)
+    book = Book.query.get(req.book_id)
+    if req.requester_id != session['user_id'] and (not book or book.owner_id != session['user_id']):
+        return jsonify({'error': 'Not allowed'}), 403
+    req.status = 'return_initiated'
+    db.session.commit()
+    return jsonify({'ok': True, 'message': 'Return initiated'})
+
+@app.route('/request/<int:req_id>/complete', methods=['POST'])
+def complete_request(req_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in'}), 401
+    req = Request.query.get_or_404(req_id)
+    book = Book.query.get(req.book_id)
+    if req.requester_id != session['user_id'] and (not book or book.owner_id != session['user_id']):
+        return jsonify({'error': 'Not allowed'}), 403
+    req.status = 'completed'
+    req.completed_at = datetime.now(timezone.utc)
+    # Transfer book back to owner when completed
+    if book:
+        book.holder_id = book.owner_id
+    db.session.commit()
+    return jsonify({'ok': True, 'message': 'Request completed'})
+
+@app.route('/request/<int:req_id>/transfer_ownership', methods=['POST'])
+def transfer_ownership(req_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in'}), 401
+    req = Request.query.get_or_404(req_id)
+    book = Book.query.get(req.book_id)
+    if not book or book.owner_id != session['user_id']:
+        return jsonify({'error': 'Only owner can transfer'}), 403
+    # Transfer ownership of the book to the requester
+    book.owner_id = req.requester_id
+    book.holder_id = req.requester_id
+    book.possessed_since = datetime.now(timezone.utc)
+    req.status = 'completed'
+    req.completed_at = datetime.now(timezone.utc)
+    db.session.commit()
+    return jsonify({'ok': True, 'message': 'Ownership transferred'})
+
+@app.route('/request/<int:req_id>/chat', methods=['GET', 'POST'])
+def request_chat(req_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in'}), 401
+    req = Request.query.get_or_404(req_id)
+    book = Book.query.get(req.book_id)
+    if session['user_id'] not in [req.requester_id, book.owner_id if book else None]:
+        return jsonify({'error': 'Not allowed'}), 403
+    if request.method == 'POST':
+        message = request.form.get('message') or (request.json.get('message') if request.is_json else None)
+        if not message:
+            return jsonify({'error': 'Message required'}), 400
+        # Determine receiver
+        sender_id = session['user_id']
+        if sender_id == req.requester_id:
+            receiver_id = book.owner_id if book else None
+        else:
+            receiver_id = req.requester_id
+        chat = ChatMessage(request_id=req.id, sender_id=sender_id, sent_to_id=receiver_id, message=message)
+        db.session.add(chat)
+        db.session.commit()
+        return jsonify({'ok': True, 'message': 'Message sent'})
+    # GET
+    return jsonify([{
+        'id': m.id,
+        'sender': User.query.get(m.sender_id).username if m.sender_id else None,
+        'message': m.message,
+        'created_at': m.created_at.isoformat()
+    } for m in ChatMessage.query.filter_by(request_id=req.id).all()])

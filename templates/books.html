@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
+    <!-- Main Navigation Header -->
     <header>
         <h1>Your Books - BookBank</h1>
         <nav>
@@ -16,31 +17,132 @@
                 <li><a href="/requests">Your Requests</a></li>
                 <li><a href="/logout">Log Out</a></li>
             </ul>
-        </nav>      
+        </nav>
     </header>
+
+    <!-- Main Content Area -->
     <main>
-        <section>
+        <section class="user-books-section">
             <h2>Your Books</h2>
+            
+            <!-- Check if user has books -->
             {% if books %}
-            <!-- List of the books that the user has added -->
-            <div class="book-list"></div>
-            {% for book in books %}
-            <div class="book-card">
-            <img src="${book.thumbnail}" alt="${book.title}" onerror="this.onerror=null;this.src='static/default.png';">            
-                <h3>{{ book.title }}</h3>
-                <p>Author: {{ book.author }}</p>
-                <p>Genre: {{ book.genre }}</p>
-                <p>Condition: {{ book.condition }}</p>
-                <p>Owner: {{ book.owner }}</p>
-                <p>Since: {{ book.possessed_since }}</p>
-                <button onclick="deleteBook('{{ book.id }}')">Delete Book</button>
-            </div>
-            {% endfor %}
+                <div class="requests-list">
+                    <!-- Loop through each book -->
+                    {% for book in books %}
+                    <div class="book-card">
+                        <!-- Book Information -->
+                        <div class="book-info">
+                            <img src="{{ book.thumbnail }}" 
+                                alt="{{ book.title }}" 
+                                onerror="this.onerror=null;this.src='static/default.png';">
+                            
+                            <h3>{{ book.title }}</h3>
+                            <div class="book-details">
+                                <p><strong>Author:</strong> {{ book.author }}</p>
+                                <p><strong>Genre:</strong> {{ book.genre }}</p>
+                                <p><strong>Condition:</strong> {{ book.condition }}</p>
+                                <p><strong>Owner:</strong> {{ book.owner }}</p>
+                                <p><strong>Since:</strong> {{ book.possessed_since }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Book Management Actions -->
+                        <div class="book-actions">
+                            <button onclick="deleteBook('{{ book.id }}')" class="delete-btn">
+                                Delete Book
+                            </button>
+                        </div>
+
+                        <!-- Active Requests Section -->
+                        <div class="active-requests-section">
+                            {% if book.requests %}
+                                <!-- Filter for active requests only -->
+                                {% set active_reqs = book.requests | selectattr('status', 'in', ['open', 'accepted', 'return_initiated']) | list %}
+                                
+                                {% if active_reqs %}
+                                    <h4>Active Requests:</h4>
+                                    <ul>
+                                        {% for r in active_reqs %}
+                                        <li class="request-item">
+                                            <!-- Request Information -->
+                                            <div class="request-info">
+                                                <p><strong>From:</strong> {{ r.requester }}</p>
+                                                <p><strong>Status:</strong> <span class="status-badge status-{{ r.status }}">{{ r.status }}</span></p>
+                                            </div>
+
+                                            <!-- Request Actions based on Status -->
+                                            <div class="request-actions">
+                                                {% if r.status == 'open' %}
+                                                    <button onclick="acceptRequest('{{ r.id }}')" class="accept-btn">
+                                                        Accept
+                                                    </button>
+                                                    <button onclick="rejectRequest('{{ r.id }}')" class="reject-btn">
+                                                        Reject
+                                                    </button>
+                                                {% endif %}
+                                                
+                                                {% if r.status in ['accepted', 'return_initiated'] %}
+                                                    <button onclick="completeRequest('{{ r.id }}')" class="complete-btn">
+                                                        Mark Completed
+                                                    </button>
+                                                    <button onclick="transferOwnership('{{ r.id }}')" class="transfer-btn">
+                                                        Transfer Ownership
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- Chat Section -->
+                                            <div class="chat-section">
+                                                <h5>Chat with {{ r.requester }}</h5>
+                                                
+                                                <!-- Chat Messages Display -->
+                                                <div id="chat-{{ r.id }}" class="chat-messages">
+                                                    {% for m in r.messages %}
+                                                    <div class="chat-message">
+                                                        <strong>{{ m.sender }}:</strong> 
+                                                        {{ m.message }} 
+                                                        <em>({{ m.created_at | datetimeformat('%H:%M') }})</em>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+
+                                                <!-- Chat Input Form -->
+                                                <form onsubmit="return sendOwnerChat(event, '{{ r.id }}')" class="chat-form">
+                                                    <input type="text" 
+                                                           id="msg-{{ r.id }}" 
+                                                           placeholder="Type a message" 
+                                                           required>
+                                                    <button type="submit">Send</button>
+                                                </form>
+                                            </div>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="no-requests">No active requests for this book.</p>
+                                {% endif %}
+                            {% else %}
+                                <p class="no-requests">No requests for this book.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             {% else %}
-            <p>You have not added any books yet.</p>
+                <!-- No books message -->
+                <div class="no-books">
+                    <p>You have not added any books yet.</p>
+                    <a href="/" class="add-books-link">Add your first book</a>
+                </div>
             {% endif %}
         </section>
     </main>
-    <script src="../static/js/books.js"></script>
+
+    <!-- JavaScript Files -->
+    <!-- Common functions for chat and request handling -->
+    <script src="static/js/common.js"></script>
+    <!-- Book management functions -->
+    <script src="static/js/index.js"></script>
 </body>
 </html>

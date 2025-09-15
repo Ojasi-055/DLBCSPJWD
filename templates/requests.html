@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
+    <!-- Main Navigation Header -->
     <header>
         <h1>Your Requests - BookBank</h1>
         <nav>
@@ -16,31 +17,99 @@
                 <li><a href="/requests" aria-current="page">Your Requests</a></li>
                 <li><a href="/logout">Log Out</a></li>
             </ul>
-        </nav> 
+        </nav>
     </header>
-        <main>
-            <section>
-                <h2>Your Requests</h2>
-                <!-- Section for the requests that the user has made -->
-                <div id="request-list">
-                    {% if requests %}
-                    {% for request in requests %}
-                    <div class="book-card">
-                        <h3>{{ request.title }}</h3>
-                        <img src="{{ request.thumbnail }}" alt="{{ request.title }}" onerror="this.onerror=null;this.src='static/default.png';">
-                        <p>Author: {{ request.author }}</p>
-                        <p>Condition: {{ request.condition }}</p>
-                        <p>Owner: {{ request.requested_to }}</p>
-                        <p>Holder: {{ request.holder }}</p>
-                        <p>Created At: {{ request.created_at }}</p>
-                        <p>Status: {{ request.status }}</p>                    
+
+    <!-- Main Content Area -->
+    <main>
+        <section class="user-requests-section">
+            <!-- Check if user has requests -->
+            {% if requests and requests|length > 0 %}
+                <h2>Your Book Requests</h2>
+                <div class="requests-list">
+                    <!-- Loop through each request -->
+                    {% for r in requests %}
+                    <div class="request-card">
+                        <!-- Book Information -->
+                        <div class="book-info">
+                            <img src="{{ r.book.thumbnail }}" 
+                                 alt="{{ r.book.title }}"
+                                 onerror="this.onerror=null;this.src='../static/default.png';" 
+                                 class="book-thumbnail">
+                            
+                            <div class="book-details">
+                                <h3>{{ r.book.title }}</h3>
+                                <p><strong>by</strong> {{ r.book.author }}</p>
+                                <p><strong>Genre:</strong> {{ r.book.genre }}</p>
+                                <p><strong>Condition:</strong> {{ r.book.condition }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Ownership and Request Information -->
+                        <div class="ownership-info">
+                            <p><strong>Owner:</strong> {{ r.book.owner.username }}</p>
+                            <p><strong>Holder:</strong> {{ (r.book.holder.username if r.book.holder else r.book.owner.username) }}</p>
+                            <p><strong>Requested on:</strong> {{ r.created_at[:10] }}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="status-badge status-{{ r.status }}">{{ r.status }}</span>
+                            </p>
+                        </div>
+
+                        <!-- Chat Section -->
+                        <div class="chat-section">
+                            <h4>Chat with Owner</h4>
+                            
+                            <!-- Chat Messages Display -->
+                            <div id="chat-{{ r.id }}" class="chat-messages">
+                                {% for m in r.messages %}
+                                <div class="chat-message">
+                                    <strong>{{ m.sender }}:</strong> 
+                                    {{ m.message }} 
+                                    <em>({{ m.created_at[11:16] }})</em>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Chat Input Form -->
+                            <form onsubmit="return sendChat(event, {{ r.id }})" class="chat-form">
+                                <input type="text" 
+                                       id="msg-{{ r.id }}" 
+                                       placeholder="Type a message" 
+                                       required>
+                                <button type="submit">Send</button>
+                            </form>
+                        </div>
+
+                        <!-- Request Actions -->
+                        <div class="request-actions">
+                            <!-- Show return button only for accepted requests -->
+                            {% if r.status == 'accepted' %}
+                                <button onclick="initiateReturn({{ r.id }})" class="return-btn">
+                                    Initiate Return
+                                </button>
+                            {% endif %}
+                            
+                            <!-- Delete request button -->
+                            <button onclick="deleteRequest({{ r.id }})" class="delete-btn">
+                                Delete Request
+                            </button>
+                        </div>
                     </div>
                     {% endfor %}
-                    {% else %}
-                    <p>You have not made any requests yet.</p>
-                    {% endif %}
                 </div>
-            </section>
-        </main>
+            {% else %}
+                <!-- No requests message -->
+                <div class="no-requests">
+                    <h2>Your Book Requests</h2>
+                    <p>You have not requested any books yet.</p>
+                    <a href="/" class="browse-books-link">Browse available books</a>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <!-- JavaScript Files -->
+    <!-- Common functions for chat and request handling -->
+    <script src="static/js/common.js"></script>
 </body>
 </html>
